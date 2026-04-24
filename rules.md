@@ -1,53 +1,61 @@
-# Proteo: Reglas y Lineamientos de Evolución
-
-Este documento establece los principios fundamentales y las directrices técnicas que deben regir cualquier implementación futura o mejora del framework Proteo.
+# Proteo: Reglas y Lineamientos de Evolución (v1.2)
 
 ## 🎯 Propósito del Programa
-Proteo no es solo una herramienta de edición; es un **entorno de auto-evolución segura**. Su propósito es permitir que agentes de IA operen sobre código fuente local de manera quirúrgica, minimizando el riesgo de corrupción de datos y permitiendo la mejora continua del propio sistema.
+Proteo es un framework de **auto-evolución segura**. Permite a agentes de IA manipular código local mediante un motor de acciones JSON, garantizando la integridad del sistema mediante clonación y backups automáticos.
+
+---
+
+## 💻 Entorno de Ejecución
+Este programa está diseñado para ejecutarse en **Windows 11** utilizando **PowerShell**. 
+
+### Comandos de Referencia
+- **Ejecución Directa**: `python .\proteo_actual.py`
+- **Con JSON**: `python .\proteo_actual.py --execute-json .\instrucciones.json`
+- **Simulación**: `python .\proteo_actual.py --dry-run --execute-json .\instrucciones.json`
+- **Listar archivos**: `ls`, `dir` o `Get-ChildItem`
 
 ---
 
 ## 🛡️ Principios de Diseño (Core Mandates)
 
-### 1. Inmutabilidad del Núcleo
-- Cualquier cambio estructural debe realizarse mediante el mecanismo de `clone_self`.
-- Nunca se debe modificar directamente el script en ejecución si existe un riesgo de romper la lógica actual.
-- El archivo `proteo_core_backup.py` debe permanecer intacto como última línea de defensa.
-
-### 2. Modificación Quirúrgica
-- Se prefiere el reemplazo de texto exacto (`find`/`replace`) sobre la sobreescritura total.
-- Cada modificación debe ser lo más pequeña y específica posible.
-- Siempre se debe generar un archivo `.bak` antes de una operación `modify`.
-
-### 3. Retroalimentación de Fallos (Self-Healing)
-- Todo error de ejecución debe ser capturado.
-- El sistema debe priorizar la generación de un `CRASH_DUMP` informativo para que el agente pueda auto-corregirse en el siguiente ciclo.
+1.  **Inmutabilidad**: Los cambios estructurales requieren `clone_self`. El archivo `proteo_core_backup.py` es intocable.
+2.  **Surgical Edit**: Se prefiere `modify` (exact match) con generación automática de `.bak`.
+3.  **Self-Healing**: Captura de errores y generación de `CRASH_DUMP` para reparación automática.
+4.  **Auto-Rollback**: Si un script ejecutado falla, el sistema restaura el backup `.bak` automáticamente.
 
 ---
 
-## 🛠️ Guía para Futuras Implementaciones
+## 🛠️ Guía de Implementación y Testeo
 
-### Estándares de Código
-- **Dependencias Cero**: Proteo debe depender exclusivamente de la biblioteca estándar de Python para garantizar portabilidad inmediata.
-- **Tipado Estricto**: Se deben usar `Type Hints` en todas las nuevas funciones para facilitar el análisis estático.
-- **Codificación**: Todo manejo de archivos debe forzar `encoding='utf-8'`.
-
-### Nuevas Acciones
-Para añadir una acción al motor:
-1. Crear una función `accion_nombre` que acepte `(op: dict, ruta: Path)`.
-2. Registrar la función en el diccionario `ACCIONES`.
-3. Documentar la nueva sintaxis en el `SYSTEM_PROMPT` embebido.
-
-### Interfaz de Usuario
-- Mantener el sistema de colores ANSI para feedback visual inmediato.
-- El menú interactivo debe ser intuitivo y permitir la salida limpia del programa en cualquier punto.
+### Cómo Probar Nuevas Funcionalidades
+1.  **Dry Run First**: Siempre validar nuevos JSON con el flag `--dry-run`.
+    ```bash
+    python proteo_actual.py --dry-run --execute-json test.json
+    ```
+2.  **Validación de Salida**: Verificar que los colores ANSI coincidan con el estado esperado (Verde=Éxito, Rojo=Error, Magenta=DryRun).
+3.  **Test de Rollback**: Forzar un error de sintaxis en un script y verificar que la versión anterior sea restaurada automáticamente.
 
 ---
 
-## 🚫 Restricciones (Anti-Patterns)
-- **No borrar backups**: Los archivos `.bak` son sagrados durante una sesión de evolución.
-- **No rutas absolutas**: Siempre que sea posible, utilizar rutas relativas o el resolvedor `LAST_CLONE`.
-- **No ejecución silenciosa**: Cada acción que afecte al sistema de archivos debe imprimir una confirmación en consola.
+## 🧹 Repo Hygiene (Mantenimiento de Orden)
+
+Para evitar el desorden (clutter), Proteo implementa un recolector de basura automático en cada ejecución:
+
+- **Raíz (Root)**: Solo se mantienen los **3 clones más recientes**.
+- **Archivo (`/archive`)**:
+    - Todos los clones antiguos se mueven aquí automáticamente.
+    - Capacidad máxima: **50 archivos**.
+    - Política **FIFO**: Al llegar a 51, se borra el más antiguo.
+- **Backups**: Los archivos `.bak` deben limpiarse manualmente una vez confirmada la estabilidad de la versión.
+
+---
+
+## 🚀 Próximas Mejoras (Roadmap)
+
+1.  **Integración Git**: Autocommit al finalizar exitosamente un ciclo de evolución.
+2.  **Fuzzy Search**: Mejorar la acción `search` para soportar búsquedas aproximadas.
+3.  **Web Interface**: Un panel simple en Flask/FastAPI para monitorear las evoluciones gráficamente.
+4.  **Sandbox de Ejecución**: Ejecutar los scripts en un entorno aislado para mayor seguridad.
 
 ---
 **Firmado por: Arquitectura Proteo**  

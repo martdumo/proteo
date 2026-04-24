@@ -1,0 +1,67 @@
+{
+  "operations": [
+    {
+      "action": "clone_self"
+    },
+    {
+      "action": "modify",
+      "path": "LAST_CLONE",
+      "find": "LAST_CLONED_PATH: Path | None = None",
+      "replace": "LAST_CLONED_PATH: Path | None = None\nDRY_RUN: bool = False"
+    },
+    {
+      "action": "modify",
+      "path": "LAST_CLONE",
+      "find": "    ROJO = '\\\\033[91m'\n    CYAN = '\\\\033[96m'\n    RESET = '\\\\033[0m'",
+      "replace": "    ROJO = '\\\\033[91m'\n    CYAN = '\\\\033[96m'\n    MAGENTA = '\\\\033[95m'\n    RESET = '\\\\033[0m'"
+    },
+    {
+      "action": "modify",
+      "path": "LAST_CLONE",
+      "find": "def accion_create(op: dict[str, Any], ruta: Path) -> None:\n    ruta.write_text(op.get('content', ''), encoding='utf-8')\n    print(f\"{Color.VERDE}[CREADO]{Color.RESET} {ruta}\")",
+      "replace": "def accion_create(op: dict[str, Any], ruta: Path) -> None:\n    if DRY_RUN:\n        print(f\"{Color.MAGENTA}[DRY-RUN]{Color.RESET} Crearía archivo: {ruta}\")\n        return\n    ruta.write_text(op.get('content', ''), encoding='utf-8')\n    print(f\"{Color.VERDE}[CREADO]{Color.RESET} {ruta}\")"
+    },
+    {
+      "action": "modify",
+      "path": "LAST_CLONE",
+      "find": "def accion_modify(op: dict[str, Any], ruta: Path) -> None:\n    buscar = op.get('find', '')\n    reemplazar = op.get('replace', '')\n    if not buscar:\n        return\n    crear_backup(ruta)\n    texto = ruta.read_text(encoding='utf-8')\n    if buscar in texto:\n        ruta.write_text(texto.replace(buscar, reemplazar), encoding='utf-8')\n        print(f\"{Color.VERDE}[MODIFICADO]{Color.RESET} {ruta}\")\n    else:\n        print(f\"{Color.AMARILLO}[AVISO]{Color.RESET} Texto a modificar no encontrado en {ruta}\")",
+      "replace": "def accion_modify(op: dict[str, Any], ruta: Path) -> None:\n    buscar = op.get('find', '')\n    reemplazar = op.get('replace', '')\n    if not buscar:\n        return\n    if DRY_RUN:\n        print(f\"{Color.MAGENTA}[DRY-RUN]{Color.RESET} Modificaría: {ruta}\")\n        return\n    crear_backup(ruta)\n    texto = ruta.read_text(encoding='utf-8')\n    if buscar in texto:\n        ruta.write_text(texto.replace(buscar, reemplazar), encoding='utf-8')\n        print(f\"{Color.VERDE}[MODIFICADO]{Color.RESET} {ruta}\")\n    else:\n        print(f\"{Color.AMARILLO}[AVISO]{Color.RESET} Texto a modificar no encontrado en {ruta}\")"
+    },
+    {
+      "action": "modify",
+      "path": "LAST_CLONE",
+      "find": "def accion_read(op: dict[str, Any], ruta: Path) -> None:",
+      "replace": "def limpiar_repositorio() -> None:\n    \"\"\"Mantiene solo los 3 últimos proteos en raíz y archiva el resto.\"\"\"\n    archivo_dir = Path(\"archive\")\n    if not DRY_RUN: archivo_dir.mkdir(exist_ok=True)\n    \n    proteos = sorted(list(Path(\".\").glob(\"proteo20[0-9]*.py\")), key=os.path.getmtime, reverse=True)\n    if len(proteos) > 3:\n        para_archivar = proteos[3:]\n        for p in para_archivar:\n            if DRY_RUN:\n                print(f\"{Color.MAGENTA}[DRY-RUN]{Color.RESET} Archivaría: {p.name}\")\n                continue\n            shutil.move(str(p), str(archivo_dir / p.name))\n            print(f\"{Color.AMARILLO}[LIMPIEZA]{Color.RESET} Movido a /archive: {p.name}\")\n\n    # Limpieza de /archive (Máx 50)\n    historial = sorted(list(archivo_dir.glob(\"proteo*.py\")), key=os.path.getmtime)\n    while len(historial) > 50:\n        viejo = historial.pop(0)\n        if DRY_RUN:\n            print(f\"{Color.MAGENTA}[DRY-RUN]{Color.RESET} Borraría histórico: {viejo.name}\")\n            continue\n        viejo.unlink()\n        print(f\"{Color.ROJO}[LIMPIEZA]{Color.RESET} Eliminado por antigüedad: {viejo.name}\")\n\ndef accion_search(op: dict[str, Any], ruta: Path) -> None:\n    import re\n    pattern = op.get('pattern', '')\n    if not pattern or not ruta.exists(): return\n    texto = ruta.read_text(encoding='utf-8')\n    matches = list(re.finditer(pattern, texto))\n    print(f\"\\n{Color.CYAN}--- BÚSQUEDA EN {ruta.name} (Patrón: {pattern}) ---{Color.RESET}\")\n    for m in matches:\n        linea = texto.count('\\\\n', 0, m.start()) + 1\n        print(f\" L{linea}: {m.group().strip()}\")\n    print(f\"{Color.CYAN}--- TOTAL: {len(matches)} coincidencias ---{Color.RESET}\\n\")\n\ndef accion_read(op: dict[str, Any], ruta: Path) -> None:"
+    },
+    {
+      "action": "modify",
+      "path": "LAST_CLONE",
+      "find": "        resultado = subprocess.run(cmd, capture_output=True, text=True, timeout=300)\n        if resultado.returncode != 0:\n            generar_crash_dump(ruta, resultado.stderr)\n        else:",
+      "replace": "        resultado = subprocess.run(cmd, capture_output=True, text=True, timeout=300)\n        if resultado.returncode != 0:\n            generar_crash_dump(ruta, resultado.stderr)\n            # Auto-Rollback if .bak exists\n            bak = ruta.with_suffix(ruta.suffix + '.bak')\n            if bak.exists():\n                shutil.copy2(bak, ruta)\n                print(f\"{Color.ROJO}[ROLLBACK]{Color.RESET} Restaurado {ruta.name} desde backup debido a fallo.\")\n        else:"
+    },
+    {
+      "action": "modify",
+      "path": "LAST_CLONE",
+      "find": "    'read': accion_read,",
+      "replace": "    'read': accion_read,\n    'search': accion_search,"
+    },
+    {
+      "action": "modify",
+      "path": "LAST_CLONE",
+      "find": "    asegurar_core_backup()\n\n    for op in data.get('operations', []):",
+      "replace": "    asegurar_core_backup()\n    limpiar_repositorio()\n\n    for op in data.get('operations', []):"
+    },
+    {
+      "action": "modify",
+      "path": "LAST_CLONE",
+      "find": "    parser.add_argument(\"--execute-json\", type=str, metavar=\"JSON_PATH\", help=\"Ruta al archivo JSON a procesar.\")",
+      "replace": "    parser.add_argument(\"--execute-json\", type=str, metavar=\"JSON_PATH\", help=\"Ruta al archivo JSON a procesar.\")\n    parser.add_argument(\"--dry-run\", action=\"store_true\", help=\"Simula las acciones sin modificar archivos.\")"
+    },
+    {
+      "action": "modify",
+      "path": "LAST_CLONE",
+      "find": "    if args.export_prompts:\n        exportar_prompts()",
+      "replace": "    if args.dry_run:\n        global DRY_RUN\n        DRY_RUN = True\n        print(f\"{Color.MAGENTA}[MODO DRY-RUN ACTIVADO]{Color.RESET}\")\n\n    if args.export_prompts:\n        exportar_prompts()"
+    }
+  ]
+}

@@ -1,0 +1,27 @@
+{
+  "operations": [
+    {
+      "action": "create",
+      "path": "script_prueba.py",
+      "content": "def saludo():\n    print('Hola, este es un script de prueba')\n\nif __name__ == '__main__':\n    saludo()"
+    },
+    {
+      "action": "modify",
+      "path": "script_prueba.py",
+      "find": "Hola, este es un script de prueba",
+      "replace": "¡Proteo funciona perfectamente!"
+    },
+    {
+      "action": "read",
+      "path": "script_prueba.py"
+    },
+    {
+      "action": "execute",
+      "path": "script_prueba.py"
+    },
+    {
+      "action": "delete_full",
+      "path": "script_prueba.py"
+    }
+  ]
+}
