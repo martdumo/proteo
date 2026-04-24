@@ -1,0 +1,31 @@
+{
+  "operations": [
+    {
+      "action": "clone_self"
+    },
+    {
+      "action": "modify",
+      "path": "LAST_CLONE",
+      "find": "def accion_create(op: dict[str, Any], ruta: Path) -> None:\n    if DRY_RUN:\n        print(f\"{Color.MAGENTA}[DRY-RUN]{Color.RESET} Crearía archivo: {ruta}\")\n        return\n    ruta.write_text(op.get('content', ''), encoding='utf-8')\n    print(f\"{Color.VERDE}[CREADO]{Color.RESET} {ruta}\")",
+      "replace": "def validar_sintaxis(contenido: str, nombre: str) -> bool:\n    if not nombre.endswith('.py'): return True\n    try:\n        import ast\n        ast.parse(contenido)\n        return True\n    except SyntaxError as e:\n        print(f\"{Color.ROJO}[ERROR SINTAXIS]{Color.RESET} {nombre}: {e}\")\n        return False\n\ndef accion_create(op: dict[str, Any], ruta: Path) -> None:\n    if DRY_RUN:\n        print(f\"{Color.MAGENTA}[DRY-RUN]{Color.RESET} Crearía archivo: {ruta}\")\n        return\n    content = op.get('content', '')\n    if not validar_sintaxis(content, ruta.name):\n        print(f\"{Color.AMARILLO}[AVISO]{Color.RESET} Abortando creación de {ruta.name} por error de sintaxis.\")\n        return\n    ruta.write_text(content, encoding='utf-8')\n    print(f\"{Color.VERDE}[CREADO]{Color.RESET} {ruta}\")"
+    },
+    {
+      "action": "modify",
+      "path": "LAST_CLONE",
+      "find": "    if buscar in texto:\n        ruta.write_text(texto.replace(buscar, reemplazar), encoding='utf-8')\n        print(f\"{Color.VERDE}[MODIFICADO]{Color.RESET} {ruta}\")",
+      "replace": "    if buscar in texto:\n        nuevo_texto = texto.replace(buscar, reemplazar)\n        if not validar_sintaxis(nuevo_texto, ruta.name):\n             print(f\"{Color.AMARILLO}[AVISO]{Color.RESET} Abortando modificación de {ruta.name} por error de sintaxis.\")\n             return\n        ruta.write_text(nuevo_texto, encoding='utf-8')\n        print(f\"{Color.VERDE}[MODIFICADO]{Color.RESET} {ruta}\")"
+    },
+    {
+      "action": "modify",
+      "path": "LAST_CLONE",
+      "find": "def accion_delete_full(op: dict[str, Any], ruta: Path) -> None:\n    if ruta.exists():\n        ruta.unlink()\n        print(f\"{Color.ROJO}[ELIMINADO]{Color.RESET} {ruta}\")",
+      "replace": "def accion_delete_full(op: dict[str, Any], ruta: Path) -> None:\n    if ruta.exists():\n        ruta.unlink()\n        print(f\"{Color.ROJO}[ELIMINADO]{Color.RESET} {ruta}\")\n        # Limpiar backup asociado\n        bak = ruta.with_suffix(ruta.suffix + '.bak')\n        if bak.exists():\n            bak.unlink()\n            print(f\"{Color.AMARILLO}[LIMPIEZA]{Color.RESET} Backup eliminado: {bak.name}\")\n\ndef accion_rename(op: dict[str, Any], ruta: Path) -> None:\n    nueva_ruta = Path(op.get('to', ''))\n    if not nueva_ruta: return\n    if DRY_RUN:\n        print(f\"{Color.MAGENTA}[DRY-RUN]{Color.RESET} Renombraría {ruta} a {nueva_ruta}\")\n        return\n    if ruta.exists():\n        shutil.move(str(ruta), str(nueva_ruta))\n        print(f\"{Color.VERDE}[RENOMBRADO]{Color.RESET} {ruta} -> {nueva_ruta}\")"
+    },
+    {
+      "action": "modify",
+      "path": "LAST_CLONE",
+      "find": "    'delete_full': accion_delete_full,",
+      "replace": "    'delete_full': accion_delete_full,\n    'rename': accion_rename,"
+    }
+  ]
+}

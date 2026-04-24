@@ -22,6 +22,7 @@ Este programa está diseñado para ejecutarse en **Windows 11** utilizando **Pow
 2.  **Surgical Edit**: Se prefiere `modify` (exact match) con generación automática de `.bak`.
 3.  **Self-Healing**: Captura de errores y generación de `CRASH_DUMP` para reparación automática.
 4.  **Auto-Rollback**: Si un script ejecutado falla, el sistema restaura el backup `.bak` automáticamente.
+5.  **Auto-Evolución**: Siempre que sea posible, las mejoras y modificaciones de Proteo deben implementarse utilizando el propio motor de Proteo para diagnosticar y validar su funcionamiento en tiempo real.
 
 ---
 
