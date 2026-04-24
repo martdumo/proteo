@@ -1,0 +1,27 @@
+{
+  "operations": [
+    {
+      "action": "create",
+      "path": "script_error.py",
+      "content": "def fallo(:\n    print('error')"
+    },
+    {
+      "action": "create",
+      "path": "script_ok.py",
+      "content": "print('Todo OK')"
+    },
+    {
+      "action": "rename",
+      "path": "script_ok.py",
+      "to": "script_renombrado.py"
+    },
+    {
+      "action": "execute",
+      "path": "script_renombrado.py"
+    },
+    {
+      "action": "delete_full",
+      "path": "script_renombrado.py"
+    }
+  ]
+}
