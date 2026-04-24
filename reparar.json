@@ -1,0 +1,10 @@
+{
+  "operations": [
+    {
+      "action": "modify",
+      "path": "proteo.py",
+      "find": "import json\nimport shutil\nimport subprocess\nimport sys\nimport argparse\nimport os\nfrom datetime import datetime\nfrom pathlib import Path\nfrom typing import Any, Callable",
+      "replace": "import json\nimport shutil\nimport subprocess\nimport sys\nimport argparse\nimport os\nimport io\nfrom datetime import datetime\nfrom pathlib import Path\nfrom typing import Any, Callable\n\nsys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding='utf-8', errors='replace')\nsys.stderr = io.TextIOWrapper(sys.stderr.buffer, encoding='utf-8', errors='replace')"
+    }
+  ]
+}

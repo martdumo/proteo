@@ -1,0 +1,49 @@
+{
+  "operations": [
+    {
+      "action": "clone_self"
+    },
+    {
+      "action": "modify",
+      "path": "LAST_CLONE",
+      "find": "from typing import Any, Callable",
+      "replace": "from typing import Any, Callable\n\nclass Color:\n    VERDE = '\\\\033[92m'\n    AMARILLO = '\\\\033[93m'\n    ROJO = '\\\\033[91m'\n    CYAN = '\\\\033[96m'\n    RESET = '\\\\033[0m'"
+    },
+    {
+      "action": "modify",
+      "path": "LAST_CLONE",
+      "find": "- `delete_full`: Borra el archivo entero. Requiere `path`.",
+      "replace": "- `delete_full`: Borra el archivo entero. Requiere `path`.\\n- `read`: Lee y muestra el contenido de un archivo. Requiere `path`."
+    },
+    {
+      "action": "modify",
+      "path": "LAST_CLONE",
+      "find": "def accion_delete_full(op: dict[str, Any], ruta: Path) -> None:\n    if ruta.exists():\n        ruta.unlink()\n        print(f\"[ELIMINADO] {ruta}\")",
+      "replace": "def accion_delete_full(op: dict[str, Any], ruta: Path) -> None:\n    if ruta.exists():\n        ruta.unlink()\n        print(f\"{Color.ROJO}[ELIMINADO]{Color.RESET} {ruta}\")\n\ndef accion_read(op: dict[str, Any], ruta: Path) -> None:\n    if ruta.exists():\n        contenido = ruta.read_text(encoding='utf-8')\n        print(f\"\\n{Color.CYAN}--- CONTENIDO DE {ruta.name} ---{Color.RESET}\")\n        print(contenido)\n        print(f\"{Color.CYAN}---------------------------------{Color.RESET}\\n\")\n    else:\n        print(f\"{Color.ROJO}[ERROR]{Color.RESET} No se puede leer, no existe: {ruta}\")"
+    },
+    {
+      "action": "modify",
+      "path": "LAST_CLONE",
+      "find": "    'delete_full': accion_delete_full,",
+      "replace": "    'delete_full': accion_delete_full,\n    'read': accion_read,"
+    },
+    {
+      "action": "modify",
+      "path": "LAST_CLONE",
+      "find": "print(f\"[CREADO] {ruta}\")",
+      "replace": "print(f\"{Color.VERDE}[CREADO]{Color.RESET} {ruta}\")"
+    },
+    {
+      "action": "modify",
+      "path": "LAST_CLONE",
+      "find": "print(f\"[MODIFICADO] {ruta}\")",
+      "replace": "print(f\"{Color.VERDE}[MODIFICADO]{Color.RESET} {ruta}\")"
+    },
+    {
+      "action": "modify",
+      "path": "LAST_CLONE",
+      "find": "print(f\"[AVISO] Texto a modificar no encontrado en {ruta}\")",
+      "replace": "print(f\"{Color.AMARILLO}[AVISO]{Color.RESET} Texto a modificar no encontrado en {ruta}\")"
+    }
+  ]
+}

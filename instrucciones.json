@@ -1,0 +1,12 @@
+{
+  "operations": [
+    {
+      "action": "clone_self"
+    },
+    {
+      "action": "execute",
+      "path": "LAST_CLONE",
+      "argumento": "--export-prompts"
+    }
+  ]
+}
